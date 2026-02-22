@@ -1,0 +1,32 @@
+name: Rust CI
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Compilation et Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer la toolchain Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Vérifier le formatage
+        # On précise le dossier avec --manifest-path
+        run: cargo fmt --all --check --manifest-path rust_core/Cargo.toml
+
+      - name: Compilation (Check)
+        run: cargo check --manifest-path rust_core/Cargo.toml
+
+      - name: Exécuter les tests
+        run: cargo test --manifest-path rust_core/Cargo.toml
+
+      - name: Clippy (Analyse de code)
+        run: cargo clippy --manifest-path rust_core/Cargo.toml -- -D warnings
